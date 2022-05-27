@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myappweb1
+  namespace: dev1
+spec:
+  selector:
+    matchLabels:
+      app: myappweb1
+  template:
+    metadata:
+      labels:
+        app: myappweb1
+    spec:
+      containers:
+      - name: myappweb1
+        image: wordpress  
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80

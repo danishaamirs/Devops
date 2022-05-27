@@ -1,0 +1,40 @@
+docker network create mynetwork
+
+
+
+Docker build -f ./wordpress.dockerfile . -t danish/wordpress-example
+
+docker run -it --rm -p 80:80 --net mynetwork danish/wordpress-example
+
+# to access the wordpress app go to browser http://localhost/wp-admin/setup-config.php
+
+Docker build -f ./mysql.dockerfile . -t danish/mysql-example
+
+#Run MYSQL container with this configuration to maintaine state 
+mkdir data
+
+        docker run --rm -d `
+        --name mysql `
+        --net mynetwork `
+        -e MYSQL_DATABASE=exampledb `
+        -e MYSQL_USER=exampleuser `
+        -e MYSQL_PASSWORD=examplepassword `
+        -e MYSQL_RANDOM_ROOT_PASSWORD=1 `
+        -v ${PWD}/data:/var/lib/mysql `
+        danish/mysql-example
+
+# Run Wordpress Stie with updtaetd configuration to connect to smysql DB
+        docker run -d `
+        --rm `
+        -p 80:80 `
+        --name wordpress `
+        --net mynetwork `
+        -e WORDPRESS_DB_HOST=mysql `
+        -e WORDPRESS_DB_USER=exampleuser `
+        -e WORDPRESS_DB_PASSWORD=examplepassword `
+        -e WORDPRESS_DB_NAME=exampledb `
+        danish/wordpress-example
+
+docker rm -f wordpress
+docker rm -f mysql
+docker rm -f mynetwork
